@@ -39,6 +39,13 @@ spec:
                 if [ -n "$GAME_PASSWORD" ]; then
                   sed -i "s/\"game_password\": \"\"/\"game_password\": \"$GAME_PASSWORD\"/" /tmp/server-settings.json
                 fi
+                # Inject Factorio credentials for mod downloads if they exist
+                if [ -n "$FACTORIO_USERNAME" ]; then
+                  sed -i "s/\"username\": \"\"/\"username\": \"$FACTORIO_USERNAME\"/" /tmp/server-settings.json
+                fi
+                if [ -n "$FACTORIO_TOKEN" ]; then
+                  sed -i "s/\"token\": \"\"/\"token\": \"$FACTORIO_TOKEN\"/" /tmp/server-settings.json
+                fi
                 cp /tmp/server-settings.json /factorio/config/server-settings.json
               fi
               # Copy mod-list if provided
