@@ -124,7 +124,8 @@ If mods aren't compatible with your Factorio version:
 
 ## Mod Portal Credentials (Optional)
 
-For premium mods, faster downloads, or private mods, you can add your Factorio credentials:
+For premium mods, faster downloads, or private mods, you can add your Factorio
+credentials:
 
 ### Quick Setup
 
@@ -132,7 +133,7 @@ For premium mods, faster downloads, or private mods, you can add your Factorio c
    ```bash
    # Interactive mode
    ./scripts/create-mod-credentials-secret.sh
-   
+
    # Or with arguments
    ./scripts/create-mod-credentials-secret.sh 'your-username' 'your-token'
    ```
