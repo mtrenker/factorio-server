@@ -34,14 +34,14 @@ spec:
               if [ -f /config-source/server-settings.json ]; then
                 cp /config-source/server-settings.json /factorio/config/server-settings.json
               fi
-              chown -R 1000:1000 /factorio/config
           volumeMounts:
             - name: factorio-data
               mountPath: /factorio
             - name: server-settings
               mountPath: /config-source
           securityContext:
-            runAsUser: 0
+            runAsUser: 1000
+            runAsNonRoot: true
       containers:
         - name: factorio
           image: factoriotools/factorio:stable-rootless
