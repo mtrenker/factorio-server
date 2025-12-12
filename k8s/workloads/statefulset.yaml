@@ -19,6 +19,8 @@ spec:
         app.kubernetes.io/name: factorio
         app.kubernetes.io/component: game-server
     spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       securityContext:
         fsGroup: 1000
         runAsUser: 1000
@@ -61,7 +63,6 @@ spec:
           ports:
             - name: game
               containerPort: 34197
-              hostPort: 34197
               protocol: UDP
             - name: rcon
               containerPort: 27015
