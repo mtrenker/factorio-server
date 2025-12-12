@@ -53,8 +53,7 @@ echo "Encrypting credentials..."
 ENCRYPTED_USERNAME=$(echo -n "$USERNAME" | kubeseal --raw \
     --from-file=/dev/stdin \
     --name "$SECRET_NAME" \
-    --namespace "$NAMESPACE" \
-    --scope cluster-wide)
+    --namespace "$NAMESPACE")
 
 if [ -z "$ENCRYPTED_USERNAME" ]; then
     echo "Error: Failed to encrypt username"
@@ -65,8 +64,7 @@ fi
 ENCRYPTED_TOKEN=$(echo -n "$TOKEN" | kubeseal --raw \
     --from-file=/dev/stdin \
     --name "$SECRET_NAME" \
-    --namespace "$NAMESPACE" \
-    --scope cluster-wide)
+    --namespace "$NAMESPACE")
 
 if [ -z "$ENCRYPTED_TOKEN" ]; then
     echo "Error: Failed to encrypt token"
