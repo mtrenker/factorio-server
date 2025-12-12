@@ -32,8 +32,20 @@ spec:
             - |
               mkdir -p /factorio/config
               if [ -f /config-source/server-settings.json ]; then
-                cp /config-source/server-settings.json /factorio/config/server-settings.json
+                cp /config-source/server-settings.json /tmp/server-settings.json
+                # Inject game password from secret if it exists
+                if [ -n "$GAME_PASSWORD" ]; then
+                  sed -i "s/\"game_password\": \"\"/\"game_password\": \"$GAME_PASSWORD\"/" /tmp/server-settings.json
+                fi
+                cp /tmp/server-settings.json /factorio/config/server-settings.json
               fi
+          env:
+            - name: GAME_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: factorio-game-password
+                  key: game-password
+                  optional: true
           volumeMounts:
             - name: factorio-data
               mountPath: /factorio

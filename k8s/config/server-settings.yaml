@@ -16,7 +16,7 @@ data:
       "max_players": 0,
       "_comment_visibility": "public: Game will be published on the official Factorio matching server. lan: Game will be broadcast on LAN",
       "visibility": {
-        "public": true,
+        "public": false,
         "lan": false
       },
       "_comment_credentials": "Your factorio.com login credentials. Required for games with visibility public",
