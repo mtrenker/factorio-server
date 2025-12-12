@@ -32,7 +32,7 @@ spec:
             - sh
             - -c
             - |
-              mkdir -p /factorio/config
+              mkdir -p /factorio/config /factorio/mods
               if [ -f /config-source/server-settings.json ]; then
                 cp /config-source/server-settings.json /tmp/server-settings.json
                 # Inject game password from secret if it exists
@@ -40,6 +40,10 @@ spec:
                   sed -i "s/\"game_password\": \"\"/\"game_password\": \"$GAME_PASSWORD\"/" /tmp/server-settings.json
                 fi
                 cp /tmp/server-settings.json /factorio/config/server-settings.json
+              fi
+              # Copy mod-list if provided
+              if [ -f /mod-list-source/mod-list.json ]; then
+                cp /mod-list-source/mod-list.json /factorio/mods/mod-list.json
               fi
           env:
             - name: GAME_PASSWORD
@@ -53,6 +57,8 @@ spec:
               mountPath: /factorio
             - name: server-settings
               mountPath: /config-source
+            - name: mod-list
+              mountPath: /mod-list-source
           securityContext:
             runAsUser: 1000
             runAsNonRoot: true
@@ -79,7 +85,7 @@ spec:
             - name: SAVE_NAME
               value: "my-server"
             - name: UPDATE_MODS_ON_START
-              value: "false"
+              value: "true"
           resources:
             requests:
               cpu: "2000m"
@@ -108,6 +114,9 @@ spec:
         - name: server-settings
           configMap:
             name: factorio-server-settings
+        - name: mod-list
+          configMap:
+            name: factorio-mod-list
   volumeClaimTemplates:
     - metadata:
         name: factorio-data

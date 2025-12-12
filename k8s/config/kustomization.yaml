@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - server-settings.yaml
   - sealed-secret.yaml
+  - mod-list.yaml

@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: factorio-mod-list
+  namespace: factorio
+  labels:
+    app.kubernetes.io/name: factorio
+    app.kubernetes.io/component: config
+data:
+  mod-list.json: |
+    {
+      "mods": [
+        {
+          "name": "base",
+          "enabled": true
+        },
+        {
+          "name": "space-age",
+          "enabled": true
+        },
+        {
+          "name": "bullet-trails",
+          "enabled": true
+        },
+        {
+          "name": "RateCalculator",
+          "enabled": true
+        }
+      ]
+    }
