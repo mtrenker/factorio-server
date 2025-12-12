@@ -58,7 +58,7 @@ spec:
             runAsNonRoot: true
       containers:
         - name: factorio
-          image: factoriotools/factorio:stable-rootless
+          image: factoriotools/factorio:latest-rootless
           imagePullPolicy: IfNotPresent
           ports:
             - name: game
