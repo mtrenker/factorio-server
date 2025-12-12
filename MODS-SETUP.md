@@ -122,15 +122,34 @@ If mods aren't compatible with your Factorio version:
   `factoriotools/factorio:1.1.104-rootless`)
 - Check mod compatibility on the mod portal
 
-## Note on Mod Portal Credentials
+## Mod Portal Credentials (Optional)
 
-Currently, mods are downloaded anonymously. For premium mods or faster
-downloads, you can add credentials:
+For premium mods, faster downloads, or private mods, you can add your Factorio credentials:
 
-1. Get your token from https://factorio.com/profile
-2. Create a sealed secret for credentials:
+### Quick Setup
+
+1. **Run the script:**
    ```bash
-   echo -n 'your-username' | kubeseal --raw --from-file=/dev/stdin --name factorio-mod-creds --namespace factorio
-   echo -n 'your-token' | kubeseal --raw --from-file=/dev/stdin --name factorio-mod-creds --namespace factorio
+   # Interactive mode
+   ./scripts/create-mod-credentials-secret.sh
+   
+   # Or with arguments
+   ./scripts/create-mod-credentials-secret.sh 'your-username' 'your-token'
    ```
-3. Add environment variables to the StatefulSet (requires manual editing)
+
+2. **Get your token** from https://factorio.com/profile
+
+3. **Enable the secret:**
+   ```bash
+   # Uncomment the line in k8s/config/kustomization.yaml
+   sed -i 's/# - sealed-secret-mod-credentials.yaml/- sealed-secret-mod-credentials.yaml/' k8s/config/kustomization.yaml
+   ```
+
+4. **Commit and push:**
+   ```bash
+   git add k8s/config/sealed-secret-mod-credentials.yaml k8s/config/kustomization.yaml
+   git commit -m "Add mod portal credentials"
+   git push
+   ```
+
+The server will automatically use these credentials for downloading mods!
