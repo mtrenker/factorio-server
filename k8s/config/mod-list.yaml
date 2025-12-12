@@ -23,6 +23,10 @@ data:
           "enabled": true
         },
         {
+          "name": "flib",
+          "enabled": true
+        },
+        {
           "name": "RateCalculator",
           "enabled": true
         }
