@@ -59,6 +59,18 @@ spec:
                   name: factorio-game-password
                   key: game-password
                   optional: true
+            - name: FACTORIO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: factorio-mod-credentials
+                  key: username
+                  optional: true
+            - name: FACTORIO_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: factorio-mod-credentials
+                  key: token
+                  optional: true
           volumeMounts:
             - name: factorio-data
               mountPath: /factorio
