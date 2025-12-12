@@ -7,7 +7,8 @@ Dedicated Factorio game server running on Kubernetes, managed via ArgoCD GitOps.
 - **Container**: `factoriotools/factorio:stable-rootless` (non-root, UID 1000)
 - **Deployment**: StatefulSet with single replica
 - **Storage**: 20Gi persistent volume (hcloud-volumes StorageClass)
-- **Network**: NodePort for UDP game traffic, ClusterIP for RCON management
+- **Network**: hostPort for UDP game traffic (port 34197), ClusterIP for RCON
+  management
 - **Resources**: 2-3 CPU cores, 2-4Gi RAM
 
 ## Repository Structure
@@ -21,8 +22,8 @@ k8s/
 │   ├── server-settings.yaml    # Server configuration ConfigMap
 │   └── kustomization.yaml
 ├── workloads/
-│   ├── statefulset.yaml        # Main server StatefulSet
-│   ├── service-game.yaml       # NodePort UDP 34197
+│   ├── statefulset.yaml        # Main server StatefulSet (with hostPort)
+│   ├── service-game.yaml       # Headless service for game traffic
 │   ├── service-rcon.yaml       # ClusterIP TCP 27015
 │   └── kustomization.yaml
 └── kustomization.yaml          # Root kustomization
@@ -71,15 +72,15 @@ kubectl logs -n factorio factorio-0 -f
 
 ### Finding the Server IP
 
-The server uses NodePort, accessible on any cluster node IP on port 34197/UDP:
+The server uses `hostPort` to bind directly to port 34197/UDP on the node where
+the pod is running:
 
 ```bash
-# Get node IPs from your cluster
-kubectl get nodes -o wide
+# Find which node the pod is running on
+kubectl get pod -n factorio factorio-0 -o wide
 
-# Example node IPs:
-# Control plane: <control-plane-ip>
-# Worker nodes: <worker-node-ips>
+# Get the EXTERNAL-IP of that node
+kubectl get nodes -o wide
 ```
 
 ### Connection Details
@@ -94,7 +95,8 @@ kubectl get nodes -o wide
 1. Launch Factorio
 2. Click "Multiplayer" → "Browse games"
 3. Click "Connect to address"
-4. Enter: `<node-ip>:34197` (replace with your cluster node IP)
+4. Enter: `<pod-node-ip>:34197` (use the external IP of the node running the
+   pod)
 5. Click "Connect"
 
 ## Administration
@@ -308,14 +310,17 @@ kubectl logs -n factorio factorio-0
 ### Connection Issues
 
 ```bash
-# Verify service is listening
-kubectl get svc -n factorio
+# Find which node the pod is on
+kubectl get pod -n factorio factorio-0 -o wide
 
-# Check if NodePort is accessible
-nc -vuz <node-ip> 34197
+# Get the external IP of that node
+kubectl get node <node-name> -o wide
 
-# Verify firewall rule (from infra repo)
-# terraform/main.tf should have UDP 34197 rule
+# Test UDP port is accessible (from outside the cluster)
+nc -vuz <pod-node-external-ip> 34197
+
+# Verify firewall rule allows UDP 34197
+# Check your infrastructure firewall configuration
 ```
 
 ### Save File Issues
