@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: factorio
+  namespace: factorio
+  labels:
+    app.kubernetes.io/name: factorio
+    app.kubernetes.io/component: game-server
+spec:
+  serviceName: factorio
+  replicas: 1
+  selector:
+    matchLabels:
+      app: factorio
+  template:
+    metadata:
+      labels:
+        app: factorio
+        app.kubernetes.io/name: factorio
+        app.kubernetes.io/component: game-server
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsNonRoot: true
+      containers:
+        - name: factorio
+          image: factoriotools/factorio:stable-rootless
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: game
+              containerPort: 34197
+              protocol: UDP
+            - name: rcon
+              containerPort: 27015
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "34197"
+            - name: RCON_PORT
+              value: "27015"
+            - name: LOAD_LATEST_SAVE
+              value: "true"
+            - name: GENERATE_NEW_SAVE
+              value: "true"
+            - name: SAVE_NAME
+              value: "my-server"
+            - name: UPDATE_MODS_ON_START
+              value: "false"
+          resources:
+            requests:
+              cpu: "2000m"
+              memory: "2Gi"
+            limits:
+              cpu: "3000m"
+              memory: "4Gi"
+          volumeMounts:
+            - name: factorio-data
+              mountPath: /factorio
+            - name: server-settings
+              mountPath: /factorio/config/server-settings.json
+              subPath: server-settings.json
+          readinessProbe:
+            tcpSocket:
+              port: rcon
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: rcon
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+      volumes:
+        - name: server-settings
+          configMap:
+            name: factorio-server-settings
+  volumeClaimTemplates:
+    - metadata:
+        name: factorio-data
+        labels:
+          app.kubernetes.io/name: factorio
+          app.kubernetes.io/component: storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: hcloud-volumes
+        resources:
+          requests:
+            storage: 20Gi

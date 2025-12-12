@@ -1,0 +1,15 @@
+# Factorio Server Kubernetes Deployment
+
+Example files and additional configurations for the Factorio server deployment.
+
+## Optional Configurations
+
+This directory contains example configurations that are not part of the base
+deployment but can be added as needed.
+
+### Future additions
+
+- Backup CronJob
+- Monitoring/metrics exporters
+- Custom map generation settings
+- Mod management configurations
