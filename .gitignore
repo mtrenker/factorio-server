@@ -17,3 +17,5 @@ Thumbs.db
 
 # Kubernetes local testing
 *.kubeconfig
+
+.envrc

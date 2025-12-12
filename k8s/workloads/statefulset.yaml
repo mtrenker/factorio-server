@@ -23,6 +23,25 @@ spec:
         fsGroup: 1000
         runAsUser: 1000
         runAsNonRoot: true
+      initContainers:
+        - name: copy-config
+          image: busybox:latest
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /factorio/config
+              if [ -f /config-source/server-settings.json ]; then
+                cp /config-source/server-settings.json /factorio/config/server-settings.json
+              fi
+              chown -R 1000:1000 /factorio/config
+          volumeMounts:
+            - name: factorio-data
+              mountPath: /factorio
+            - name: server-settings
+              mountPath: /config-source
+          securityContext:
+            runAsUser: 0
       containers:
         - name: factorio
           image: factoriotools/factorio:stable-rootless
@@ -57,9 +76,6 @@ spec:
           volumeMounts:
             - name: factorio-data
               mountPath: /factorio
-            - name: server-settings
-              mountPath: /factorio/config/server-settings.json
-              subPath: server-settings.json
           readinessProbe:
             tcpSocket:
               port: rcon
