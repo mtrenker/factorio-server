@@ -29,6 +29,14 @@ data:
         {
           "name": "RateCalculator",
           "enabled": true
+        },
+        {
+          "name": "informatron",
+          "enabled": true
+        },
+        {
+          "name": "Todo-List",
+          "enabled": true
         }
       ]
     }
