@@ -4,11 +4,10 @@ Dedicated Factorio game server running on Kubernetes, managed via ArgoCD GitOps.
 
 ## Architecture
 
-- **Container**: `factoriotools/factorio:stable-rootless` (non-root, UID 1000)
+- **Container**: `factoriotools/factorio:latest-rootless` (non-root, UID 1000)
 - **Deployment**: StatefulSet with single replica
 - **Storage**: 20Gi persistent volume (hcloud-volumes StorageClass)
-- **Network**: hostPort for UDP game traffic (port 34197), ClusterIP for RCON
-  management
+- **Network**: hostNetwork mode (binds directly to node's network), headless service for game traffic, ClusterIP service for RCON
 - **Resources**: 2-3 CPU cores, 2-4Gi RAM
 
 ## Repository Structure
@@ -20,9 +19,10 @@ k8s/
 │   └── kustomization.yaml
 ├── config/
 │   ├── server-settings.yaml    # Server configuration ConfigMap
+│   ├── mod-list.yaml           # Mod list ConfigMap
 │   └── kustomization.yaml
 ├── workloads/
-│   ├── statefulset.yaml        # Main server StatefulSet (with hostPort)
+│   ├── statefulset.yaml        # Main server StatefulSet (with hostNetwork)
 │   ├── service-game.yaml       # Headless service for game traffic
 │   ├── service-rcon.yaml       # ClusterIP TCP 27015
 │   └── kustomization.yaml
@@ -72,8 +72,8 @@ kubectl logs -n factorio factorio-0 -f
 
 ### Finding the Server IP
 
-The server uses `hostPort` to bind directly to port 34197/UDP on the node where
-the pod is running:
+The server uses `hostNetwork: true` to bind directly to the node's network namespace,
+making port 34197/UDP accessible on the node where the pod is running:
 
 ```bash
 # Find which node the pod is running on
@@ -186,7 +186,7 @@ env:
     - name: GENERATE_NEW_SAVE
       value: "true" # Generate new save if none exists
     - name: UPDATE_MODS_ON_START
-      value: "false" # Auto-update mods on start
+      value: "true" # Auto-update mods on start
 ```
 
 ### Resource Limits
@@ -358,7 +358,7 @@ spec:
         spec:
             containers:
                 - name: factorio
-                  image: factoriotools/factorio:1.1.104-rootless # Pin specific version
+                  image: factoriotools/factorio:1.1.104-rootless # Change from latest-rootless to pin specific version
 ```
 
 **Steps**:
@@ -392,23 +392,29 @@ kubectl cp ./my-mod_1.0.0.zip factorio/factorio-0:/factorio/mods/
 kubectl rollout restart statefulset/factorio -n factorio
 ```
 
-### Automatic Method (Requires factorio.com Account)
+### Automatic Method (Requires Factorio.com Account)
 
-Edit StatefulSet environment:
+The server is configured with `UPDATE_MODS_ON_START: "true"` by default.
 
-```yaml
-env:
-    - name: UPDATE_MODS_ON_START
-      value: "true"
-    - name: USERNAME
-      value: "your-factorio-username"
-    - name: TOKEN
-      value: "your-factorio-token" # Consider using Secret instead
-```
+To enable automatic mod downloads:
 
-Place `mod-list.json` in `/factorio/mods/` with desired mods.
+1. Create a sealed secret with your Factorio credentials (see `scripts/create-mod-credentials-secret.sh`)
+2. Configure mods in [k8s/config/mod-list.yaml](k8s/config/mod-list.yaml)
+3. The initContainer will inject credentials and download mods on startup
+
+Credentials are stored in Kubernetes secrets (not in StatefulSet directly):
+- `factorio-mod-credentials` secret contains `username` and `token` keys
+- These are optionally mounted via secretKeyRef in the StatefulSet
 
 ## Security Considerations
+
+### Network Security
+
+**Important**: The StatefulSet uses `hostNetwork: true`, which means:
+- The pod shares the node's network namespace
+- All container ports are directly exposed on the node's IP
+- This bypasses Kubernetes network policies
+- Ensure your infrastructure firewall rules are properly configured
 
 ### RCON Password
 
