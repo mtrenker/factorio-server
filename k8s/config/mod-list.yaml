@@ -37,6 +37,10 @@ data:
         {
           "name": "Todo-List",
           "enabled": true
+        },
+        {
+          "name": "Nanobots2",
+          "enabled": true
         }
       ]
     }
