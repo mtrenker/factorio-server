@@ -23,6 +23,10 @@ data:
           "enabled": true
         },
         {
+          "name": "stdlib2",
+          "enabled": true
+        },
+        {
           "name": "flib",
           "enabled": true
         },
