@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - server-settings.yaml
+  - server-adminlist.yaml
   - sealed-secret.yaml
   - mod-list.yaml
   - sealed-secret-mod-credentials.yaml

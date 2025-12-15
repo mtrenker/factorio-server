@@ -52,6 +52,10 @@ spec:
               if [ -f /mod-list-source/mod-list.json ]; then
                 cp /mod-list-source/mod-list.json /factorio/mods/mod-list.json
               fi
+              # Copy admin list if provided
+              if [ -f /adminlist-source/server-adminlist.json ]; then
+                cp /adminlist-source/server-adminlist.json /factorio/config/server-adminlist.json
+              fi
           env:
             - name: GAME_PASSWORD
               valueFrom:
@@ -78,6 +82,8 @@ spec:
               mountPath: /config-source
             - name: mod-list
               mountPath: /mod-list-source
+            - name: server-adminlist
+              mountPath: /adminlist-source
           securityContext:
             runAsUser: 1000
             runAsNonRoot: true
@@ -148,6 +154,9 @@ spec:
         - name: mod-list
           configMap:
             name: factorio-mod-list
+        - name: server-adminlist
+          configMap:
+            name: factorio-server-adminlist
   volumeClaimTemplates:
     - metadata:
         name: factorio-data
