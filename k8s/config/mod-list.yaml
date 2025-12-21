@@ -55,6 +55,18 @@ data:
           "enabled": true
         },
         {
+          "name": "aai-containers",
+          "enabled": true
+        },
+        {
+          "name": "WideChests",
+          "enabled": true
+        },
+        {
+          "name": "WideChests-aai-reskin",
+          "enabled": true
+        },
+        {
           "name": "Nanobots2",
           "enabled": true
         }
