@@ -43,6 +43,18 @@ data:
           "enabled": true
         },
         {
+          "name": "factoryplanner",
+          "enabled": true
+        },
+        {
+          "name": "LogisticTrainNetwork",
+          "enabled": true
+        },
+        {
+          "name": "squeak-through-2",
+          "enabled": true
+        },
+        {
           "name": "Nanobots2",
           "enabled": true
         }
