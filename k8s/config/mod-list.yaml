@@ -67,6 +67,18 @@ data:
           "enabled": true
         },
         {
+          "name": "calculator-ui",
+          "enabled": true
+        },
+        {
+          "name": "GUI_Unifyer",
+          "enabled": true
+        },
+        {
+          "name": "textplates",
+          "enabled": true
+        },
+        {
           "name": "Nanobots2",
           "enabled": true
         }
